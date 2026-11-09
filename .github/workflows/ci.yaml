@@ -477,6 +477,32 @@ jobs:
           path: |
             tests/_log/
 
+  # tokio's `rt-multi-thread` does not compile for wasm. Build the library for
+  # wasm32-wasip1, so a crate or dependency that turns it back on fails here.
+  wasm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+
+      - name: Pin nightly from rust-toolchain
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+
+      - name: Setup | Toolchain
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: "${{ env.PIN }}"
+          target: wasm32-wasip1
+          override: true
+
+
+      - name: Check openraft for wasm
+        run: make wasm-check
+
+
   lint:
     name: lint
     runs-on: ubuntu-latest

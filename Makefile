@@ -16,6 +16,14 @@ test:
 	cargo test --manifest-path examples/raft-kv-memstore/Cargo.toml
 	cargo test --manifest-path examples/raft-kv-rocksdb/Cargo.toml
 
+# Build the library for wasm32-wasip1: tokio's `rt-multi-thread` does not
+# compile there, so a change that turns it back on for wasm fails here.
+# Needs the target: `rustup target add wasm32-wasip1`.
+wasm-check:
+	cargo check --target wasm32-wasip1 --manifest-path openraft/Cargo.toml --lib
+	cargo check --target wasm32-wasip1 --manifest-path openraft/Cargo.toml --lib --no-default-features
+	cargo check --target wasm32-wasip1 --manifest-path openraft/Cargo.toml --lib --features serde,singlethreaded
+
 bench:
 	cargo bench --features bench
 
@@ -76,4 +84,4 @@ typos:
 clean:
 	cargo clean
 
-.PHONY: test fmt lint clean doc guide
+.PHONY: test wasm-check fmt lint clean doc guide
